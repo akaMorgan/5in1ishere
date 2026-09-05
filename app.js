@@ -1,0 +1,15 @@
+const tracks=[
+ {tag:'HR — Would you hire me?',q:'في مقابلة عمل، ما أفضل طريقة لعرض إنجازك؟',a:['ذكر مسؤولياتك فقط','ذكر موقف محدد ونتيجة قابلة للقياس','التحدث عن الدرجات فقط','إرسال السيرة الذاتية دون شرح'],correct:1},
+ {tag:'PR — Let’s talk business',q:'ما أول خطوة لبناء شراكة ناجحة؟',a:['طلب التمويل فورًا','فهم احتياجات الطرف الآخر وقيمته المشتركة','إرسال رسالة عامة للجميع','التركيز على اسم الشركة فقط'],correct:1},
+ {tag:'OR — Make it happen',q:'عند تأخر مهمة أساسية، ما التصرف الأنسب؟',a:['تجاهلها حتى الموعد','تحديد السبب والبدائل وإبلاغ الفريق مبكرًا','البدء في مهمة مختلفة','لوم عضو واحد في الفريق'],correct:1},
+ {tag:'SM — Make it go viral',q:'ما العنصر الذي يجعل المحتوى أكثر قابلية للمشاركة؟',a:['نشره في وقت عشوائي','رسالة واضحة وقيمة حقيقية للجمهور','استخدام أكبر عدد من الهاشتاجات','كتابة نص طويل جدًا'],correct:1},
+ {tag:'TR — Think like L&D',q:'كيف تعرف أن تجربة التعلّم نجحت؟',a:['أن تكون الشرائح جميلة','أن يستطيع المتعلم تطبيق المهارة في موقف حقيقي','أن تكون مدة الجلسة طويلة','أن يحفظ المتعلم المصطلحات'],correct:1}
+];
+let current=0,score=0,answered=false;const key='fiveInOneScore';
+function showPage(id){document.querySelectorAll('.page').forEach(e=>e.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+id));if(id==='game')renderGame();if(id==='leaderboard')renderLeaderboard();window.scrollTo({top:0,behavior:'smooth'})}
+function updateScore(){document.getElementById('liveScore').textContent=score;document.getElementById('homeScore').textContent=score}
+function renderGame(){updateScore();if(current>=tracks.length){localStorage.setItem(key,String(score));showPage('leaderboard');return}const t=tracks[current];document.getElementById('progressFill').style.width=`${current*20}%`;document.getElementById('gameContent').innerHTML=`<div class="question-card"><span class="tag">${t.tag}</span><h3>${t.q}</h3><div class="answers">${t.a.map((x,i)=>`<button onclick="answer(${i})">${x}</button>`).join('')}</div><p class="feedback" id="feedback"></p></div>`;answered=false}
+function answer(i){if(answered)return;answered=true;const ok=i===tracks[current].correct,fb=document.getElementById('feedback');if(ok){score+=100;updateScore();fb.textContent='إجابة صحيحة! +100 نقطة';setTimeout(()=>{current++;renderGame()},700)}else{fb.textContent='ليست الإجابة الأنسب — حاول مرة ثانية.';answered=false}}
+function restartGame(){current=0;score=0;updateScore();showPage('game')}
+function renderLeaderboard(){const saved=Number(localStorage.getItem(key)||0),rows=[{name:'Mariam A.',score:500},{name:'Omar S.',score:400},{name:'Nour M.',score:400},{name:'أنت',score:saved,me:true},{name:'Ahmed K.',score:300}].sort((a,b)=>b.score-a.score);document.getElementById('winnerName').textContent=rows[0].name;document.getElementById('winnerScore').textContent=`${rows[0].score} نقطة`;document.getElementById('leaderRows').innerHTML=rows.map((r,i)=>`<tr class="${r.me?'you':''}"><td>${i===0?'🥇':i+1}</td><td>${r.name}</td><td>${r.score}</td><td>${r.me?'نتيجتك':'متنافس'}</td></tr>`).join('')}
+updateScore();
